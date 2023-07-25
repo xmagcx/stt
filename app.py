@@ -2,8 +2,9 @@
 # Speech recognition in Python ::: How to convert an Audio File to Text
 
 import speech_recognition as sr
-import pyttsx3
-
+import re
+import os
+from gtts import gTTS
 
 
 def write_f(name,content):
@@ -28,16 +29,28 @@ def read_audio(filename):
         
 
 def read_f(name):
-    with  open(name,'r') as file:
+    with  open(name,'r', encoding='utf-8') as file:
         return file.read()
+
+
+def removeAccents(word):
+    repl = {'à': 'a', 'á': 'a', 'â': 'a', 'ã': 'a',
+            'é': 'e', 'ê': 'e',
+            'í': 'i',
+            'ó': 'o', 'ô': 'o', 'õ': 'o',
+            'ú': 'u', 'ü': 'u'}
+
+    new_word = ''.join([repl[c] if c in repl else c for c in word])
+    return new_word
+
 
 if __name__ == "__main__":
     
     filetxt = read_f("prueba.txt")
-    engine = pyttsx3.init()
-    engine.say(filetxt)
-    engine.runAndWait()
 
-
-
-#text = r.recognize_google(audio, language='es-ES')    
+    #tokenised = removeAccents(filetxt)
+    tts = gTTS(text=filetxt, lang='es')
+    filemp3 = "hello.mp3"
+    tts.save(filemp3)
+    os.system(f"start {filemp3}")
+  
