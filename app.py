@@ -12,7 +12,7 @@ def write_f(name,content):
         file.write(content)
 
 
-def read_audio(filename):
+def read_audio(filename,filetxt):
 
     r = sr.Recognizer()
 
@@ -25,7 +25,7 @@ def read_audio(filename):
         # recognize (convert from speech to text)
         text = r.recognize_google(audio_data, language='es-ES')
         #print(text)
-        write_f("prueba",text)
+        write_f(filetxt,text)
         
 
 def read_f(name):
@@ -45,11 +45,12 @@ def removeAccents(word):
 
 
 if __name__ == "__main__":
-    
-    filetxt = read_f("prueba.txt")
-
+    filewav = "IA.wav"
+    filetxt = "prueba.txt"
+    read_audio(filewav,filetxt)
+    readtxt = read_f(filetxt)
     #tokenised = removeAccents(filetxt)
-    tts = gTTS(text=filetxt, lang='es')
+    tts = gTTS(text=readtxt, lang='es')
     filemp3 = "hello.mp3"
     tts.save(filemp3)
     os.system(f"start {filemp3}")
