@@ -6,7 +6,8 @@ import os
 #from gtts import gTTS
 from fastapi import FastAPI, HTTPException,Request, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-
+import shutil
+from pydantic import BaseModel
 
 
 
@@ -15,7 +16,7 @@ def write_f(name,content):
         file.write(content)
 
 
-def read_audio(filename):
+def read_audio(filename,lang):
 
     r = sr.Recognizer()
 
@@ -25,10 +26,7 @@ def read_audio(filename):
     with sr.AudioFile(filename) as source:
         # listen for the data (load audio to memory)
         audio_data = r.record(source)
-        # recognize (convert from speech to text)
-        text = r.recognize_google(audio_data, language='es-ES')
-        #print(text)
-        #write_f(filetxt,text)
+        text = r.recognize_google(audio_data, language=lang)
         return text
 
 def read_f(name):
@@ -51,11 +49,11 @@ app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 @app.get("/")
-def home():
+async def home():
     return {"<b> It's works </b>"}
 
 
-def save_upload_file(upload_file: UploadFile, destination: Path) -> None:
+def save_upload_file(upload_file: UploadFile, destination: str) -> None:
 
     # https://github.com/tiangolo/fastapi/issues/426#issuecomment-542828790
 
@@ -67,9 +65,8 @@ def save_upload_file(upload_file: UploadFile, destination: Path) -> None:
 
 
 @app.post("/uploadfile", status_code=201)
-def upload_sequences(
-    file: UploadFile = File(...)
-    ):
+async def upload_sequences(language:str ,file: UploadFile):
+
     try:
         path = str(os.path.join(os.getcwd(),"upload"))
         pathfile = str(os.path.join(os.getcwd(),"upload",file.filename))
@@ -80,7 +77,7 @@ def upload_sequences(
             print("The new directory is created!")
         
         save_upload_file(file, pathfile)
-        result = read_audio(pathfile)
+        result = read_audio(pathfile, language)
     except Exception as e:
         error = str(e)
         raise HTTPException(status_code=500, detail=error)
