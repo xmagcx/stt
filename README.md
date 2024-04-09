@@ -1,7 +1,7 @@
 
 ===
 ## Project Information
-- Title:  `API - Speach To Text`
+- Title:  `API - Speech To Text`
 
 
 ## Install & Dependence
